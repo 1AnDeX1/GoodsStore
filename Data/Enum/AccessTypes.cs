@@ -2,8 +2,8 @@
 {
     public enum AccessTypes
     {
-        UserAccess,
-        AdminAccess,
-        FullAccess
+        UserAccess = 1,
+        AdminAccess = 2,
+        FullAccess = 3,
     }
 }
