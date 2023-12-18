@@ -7,11 +7,11 @@ namespace GoodsStore.Models
     {
         [Key]
         public int OrderID { get; set; }
-        [ForeignKey(nameof(Customers))]
-        public int CustomerID { get; set; }
+        [ForeignKey(nameof(AppUser))]
+        public int AppUser { get; set; }
         public DateTime Date { get; set; }
         public string? Status { get; set; }
-        public Customers? Customer { get; set; }
+        public AppUser? AppUsers { get; set; }
         public ICollection<OrderItems>? OrderItems { get; set; }
     }
 }

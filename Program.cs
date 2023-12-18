@@ -1,6 +1,9 @@
 using GoodsStore.Data;
 using GoodsStore.Interfaces;
+using GoodsStore.Models;
 using GoodsStore.Repository;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +15,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+       .AddCookie();
+
+
 var app = builder.Build();
+
+if (args.Length == 1 && args[0].ToLower() == "seeddata")
+{
+    await Seed.SeedUsersAndRolesAsync(app);
+    //Seed.SeedData(app);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -28,6 +45,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",
