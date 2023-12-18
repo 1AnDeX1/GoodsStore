@@ -20,7 +20,8 @@
                             <div class="btn-group">
                                 <a asp-controller="Products" asp-action="Detail" asp-route-id="@item.ProductID" 
                                 type="button" class="btn btn-sm btn-outline-secondary">Detail</a>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                                <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductID" 
+                                type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
                             </div>
                             <small class="text-body-secondary">Ціна: @item.Price</small>
                         </div>

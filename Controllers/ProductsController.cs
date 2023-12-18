@@ -1,27 +1,91 @@
 ﻿using GoodsStore.Data;
+using GoodsStore.Interfaces;
 using GoodsStore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GoodsStore.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IProductsRepository _productsRepository;
 
-        public ProductsController(AppDbContext context) 
+        public ProductsController(IProductsRepository productsRepository) 
         {
-            _context = context;
+            _productsRepository = productsRepository;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var products = _context.Products.ToList();
+            var products = await _productsRepository.GetAll();
             return View(products);
         }
 
-        public IActionResult Detail(int id)
+        public async Task<IActionResult> Detail(int id)
         {
-            Products product = _context.Products.FirstOrDefault(p => p.ProductID == id); 
+            Products product = await _productsRepository.GetByIdAsync(id); 
             return View(product);
+        }
+        public IActionResult Create() 
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(Products product)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(product);
+            }
+            _productsRepository.Add(product);
+            return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _productsRepository.GetByIdAsync(id);
+            if(product == null) 
+                return View("Error");
+            var newproduct = new Products
+            {
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Quantity = product.Quantity,
+                Image = product.Image,
+            };
+            return View(newproduct);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Products product)
+        {
+            if(!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Failed to edit product");
+                return View("Edit", product);
+            }
+
+            var userproduct = await _productsRepository.GetByIdAsyncNoTracking(id);
+            if (userproduct != null)
+            {
+                var editedproduct = new Products
+                {
+                    ProductID = id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Quantity = product.Quantity,
+                    Image = product.Image,
+                };
+                _productsRepository.Update(editedproduct);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return View(product);
+            }
         }
     }
 }
