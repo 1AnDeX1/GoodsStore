@@ -25,19 +25,19 @@ namespace GoodsStore.Repository
             return Save();
         }
 
-        public async Task<IEnumerable<Products>> GetAll()
+        public IEnumerable<Products> GetAll()
         {
-            return await _context.Products.ToListAsync();
+            return _context.Products.ToList();
             
         }
 
-        public async Task<Products> GetByIdAsync(int id)
+        public Products GetById(int id)
         {
-            return await _context.Products.FirstOrDefaultAsync(p => p.ProductID == id);
+            return _context.Products.FirstOrDefault(p => p.ProductID == id);
         }
-        public async Task<Products> GetByIdAsyncNoTracking(int id)
+        public Products GetByIdNoTracking(int id)
         {
-            return await _context.Products.AsNoTracking().FirstOrDefaultAsync(i => i.ProductID == id);
+            return _context.Products.AsNoTracking().FirstOrDefault(i => i.ProductID == id);
         }
 
         public bool Save()

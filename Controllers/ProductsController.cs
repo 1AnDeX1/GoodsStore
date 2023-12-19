@@ -1,4 +1,6 @@
-﻿using GoodsStore.Data;
+﻿using AutoMapper;
+using GoodsStore.Data;
+using GoodsStore.Dto;
 using GoodsStore.Interfaces;
 using GoodsStore.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,20 +12,22 @@ namespace GoodsStore.Controllers
     public class ProductsController : Controller
     {
         private readonly IProductsRepository _productsRepository;
+        private readonly IMapper _mapper;
 
-        public ProductsController(IProductsRepository productsRepository) 
+        public ProductsController(IProductsRepository productsRepository, IMapper mapper) 
         {
             _productsRepository = productsRepository;
+            _mapper = mapper;
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var products = await _productsRepository.GetAll();
+            var products = _productsRepository.GetAll();
             return View(products);
         }
 
-        public async Task<IActionResult> Detail(int id)
+        public IActionResult Detail(int id)
         {
-            Products product = await _productsRepository.GetByIdAsync(id); 
+            var product = _productsRepository.GetById(id); 
             return View(product);
         }
         public IActionResult Create() 
@@ -31,7 +35,7 @@ namespace GoodsStore.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Create(Products product)
+        public IActionResult Create(Products product)
         {
             if(!ModelState.IsValid)
             {
@@ -42,9 +46,9 @@ namespace GoodsStore.Controllers
         }
 
 
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
-            var product = await _productsRepository.GetByIdAsync(id);
+            var product =  _productsRepository.GetById(id);
             if(product == null) 
                 return View("Error");
             var newproduct = new Products
@@ -59,7 +63,7 @@ namespace GoodsStore.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Products product)
+        public IActionResult Edit(int id, Products product)
         {
             if(!ModelState.IsValid)
             {
@@ -67,7 +71,7 @@ namespace GoodsStore.Controllers
                 return View("Edit", product);
             }
 
-            var userproduct = await _productsRepository.GetByIdAsyncNoTracking(id);
+            var userproduct = _productsRepository.GetByIdNoTracking(id);
             if (userproduct != null)
             {
                 var editedproduct = new Products
@@ -86,6 +90,24 @@ namespace GoodsStore.Controllers
             {
                 return View(product);
             }
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var productDetails = _productsRepository.GetById(id);
+            if (productDetails == null)
+                return View("Error");
+            return View(productDetails);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteProduct(int id)
+        {
+            var productDetails = _productsRepository.GetById(id);
+            if (productDetails == null)
+                return View("Error", 404);
+            _productsRepository.Delete(productDetails);
+            return RedirectToAction("Index");
         }
     }
 }

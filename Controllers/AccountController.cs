@@ -77,7 +77,7 @@ namespace GoodsStore.Controllers
 
             return RedirectToAction("Index", "Products");
         }
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
