@@ -1,8 +1,10 @@
 ﻿using GoodsStore.Data;
+using GoodsStore.Interfaces;
 using GoodsStore.Models;
 using GoodsStore.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoodsStore.Controllers
 {
@@ -11,11 +13,17 @@ namespace GoodsStore.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly AppDbContext _context;
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDbContext context)
+        private readonly IOrderRepository _orderRepository;
+        public AccountController(
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+            AppDbContext context,
+            IOrderRepository orderRepository)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+            _orderRepository = orderRepository;
         }
         public IActionResult Login()
         {
@@ -83,6 +91,19 @@ namespace GoodsStore.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Products");
         }
+        [HttpGet("Account/UserOrders")]
+        public async Task<IActionResult> UserOrders()
+        {
+            var user = await _userManager.GetUserAsync(User);
 
+            if (user == null)
+            {
+                return NotFound(); 
+            }
+
+            var orders = _orderRepository.GetOrdersByUser(user);
+
+            return View(orders);
+        }
     }
 }

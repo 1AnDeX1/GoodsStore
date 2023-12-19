@@ -12,7 +12,7 @@ namespace GoodsStore.Models
         [ForeignKey(nameof(Products))]
         public int ProductID { get; set; }
         public int Quantity { get; set; }
-        public Orders? Order { get; set; }
-        public Products? Product { get; set; }
+        public Orders Order { get; set; }
+        public Products Product { get; set; }
     }
 }

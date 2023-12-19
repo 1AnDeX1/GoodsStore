@@ -8,7 +8,13 @@
 
 <div class="album py-5 bg-body-tertiary">
     <div class="container">
+        <a class="btn btn-outline-primary" asp-controller="Products" asp-action="Create">
+            Add Product
+        </a>
+        <br />
+        <br />
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            
             @foreach(var item in Model){
             <div class="col">
                 <div class="card shadow-sm">
@@ -25,9 +31,14 @@
                                         <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductID"
                                            type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
                                         <a asp-controller="Products" asp-action="Delete" asp-route-id="@item.ProductID"
-                                           type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
+                                        type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
                                     }
-                                
+                                    else if (User.Identity.IsAuthenticated && User.IsInRole("user"))
+                                    {
+                                        <a asp-controller="OrderItems" asp-action="Buy" asp-route-id="@item.ProductID"
+                                           type="button" class="btn btn-sm btn-outline-secondary">Buy</a>
+                                    }
+
                             </div>
                             <small class="text-body-secondary">Ціна: @item.Price</small>
                         </div>

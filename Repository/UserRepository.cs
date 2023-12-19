@@ -28,6 +28,11 @@ namespace GoodsStore.Repository
             return await _context.Users.ToListAsync();
         }
 
+        public AppUser GetUserById(string id)
+        {
+            return _context.Users.Find(id);
+        }
+
         public async Task<AppUser> GetUserByIdAsync(string id)
         {
             return await _context.Users.FindAsync(id);

@@ -24,7 +24,7 @@ namespace GoodsStore.Controllers
             var products = _productsRepository.GetAll();
             return View(products);
         }
-
+        #region Standart Logic
         public IActionResult Detail(int id)
         {
             var product = _productsRepository.GetById(id); 
@@ -109,5 +109,8 @@ namespace GoodsStore.Controllers
             _productsRepository.Delete(productDetails);
             return RedirectToAction("Index");
         }
+        #endregion
+
+
     }
 }

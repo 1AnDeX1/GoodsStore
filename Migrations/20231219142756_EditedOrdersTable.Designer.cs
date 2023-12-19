@@ -4,6 +4,7 @@ using GoodsStore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoodsStore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231219142756_EditedOrdersTable")]
+    partial class EditedOrdersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,8 +151,11 @@ namespace GoodsStore.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
-                    b.Property<string>("AppUserID")
+                    b.Property<string>("AppUser")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AppUsersId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Date")
@@ -160,7 +166,7 @@ namespace GoodsStore.Migrations
 
                     b.HasKey("OrderID");
 
-                    b.HasIndex("AppUserID");
+                    b.HasIndex("AppUsersId");
 
                     b.ToTable("Orders");
                 });
@@ -360,9 +366,7 @@ namespace GoodsStore.Migrations
                 {
                     b.HasOne("GoodsStore.Models.AppUser", "AppUsers")
                         .WithMany("Orders")
-                        .HasForeignKey("AppUserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppUsersId");
 
                     b.Navigation("AppUsers");
                 });
