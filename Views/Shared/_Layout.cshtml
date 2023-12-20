@@ -33,6 +33,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="OrderItems" asp-action="AdminIndex">Orders</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="DeliveryQueue" asp-action="Index">DeliveryQueue</a>
+                            </li>
                         }
                         else if (User.Identity.IsAuthenticated && User.IsInRole("user"))
                         {

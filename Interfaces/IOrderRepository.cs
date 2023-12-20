@@ -4,6 +4,8 @@ namespace GoodsStore.Interfaces
 {
     public interface IOrderRepository
     {
-        List<OrderItems> GetOrdersByUser(AppUser appUser);
+        Orders GetByProductId(int id);
+        bool Update(Orders order);
+        bool Save();
     }
 }

@@ -1,0 +1,38 @@
+﻿@using GoodsStore.Models
+@model List<DeliveryQueue>
+
+<section class="flush-with-above">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">DeliveryQueue Id</th>
+                            <th scope="col">Product Id</th>
+                            <th scope="col">Quantity Request</th>
+                            <th scope="col">Date</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var deliveryqueue in Model)
+                        {
+                            <tr>
+                                <th scope="row">@deliveryqueue.DeliveryQueueID</th>
+                                <td scope="row">@deliveryqueue.ProductID</td>
+                                <th>@deliveryqueue.QuantityRequest</th>
+                                <th>@deliveryqueue.Date</th>
+                                <td>
+                                    <a class="btn btn-outline-primary" asp-controller="OrderItems" asp-action="AdminOrderDetails" asp-route-id="@deliveryqueue.DeliveryQueueID">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

@@ -12,17 +12,20 @@ namespace GoodsStore.Controllers
         private readonly IOrderItemsRepository _orderItemsRepository;
         private readonly IProductsRepository _productsRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IDeliveryQueueRepository _deliveryQueueRepository;
         private readonly IMapper _mapper;
 
         public OrderItemsController(
             IOrderItemsRepository orderItemsRepository,
             IProductsRepository productsRepository,
             IUserRepository userRepository,
+            IDeliveryQueueRepository deliveryQueueRepository,
             IMapper mapper)
         {
             _orderItemsRepository = orderItemsRepository;
             _productsRepository = productsRepository;
             _userRepository = userRepository;
+            _deliveryQueueRepository = deliveryQueueRepository;
             _mapper = mapper;
         }
         
@@ -48,34 +51,70 @@ namespace GoodsStore.Controllers
             var product = _productsRepository.GetById(productId);
 
             if (product == null)
-                return NotFound(); 
+                return NotFound();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _userRepository.GetUserById(userId);
 
             if (user == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
-            var order = new Orders
+            if (product.Quantity >= quantity)
             {
-                AppUserID = userId,
-                Date = DateTime.Now,
-                Status = "Not Done"
-            };
+                var order = new Orders
+                {
+                    AppUserID = userId,
+                    Date = DateTime.Now,
+                    Status = "Done" 
+                };
 
-            var orderItem = new OrderItems
+                var orderItem = new OrderItems
+                {
+                    ProductID = productId,
+                    Quantity = quantity,
+                    Order = order
+                };
+
+                _orderItemsRepository.Add(orderItem);
+
+                product.Quantity -= quantity;
+                _productsRepository.Update(product);
+
+                return RedirectToAction("Index", "Products");
+            }
+            else
             {
-                ProductID = productId,
-                Quantity = quantity,
-                Order = order 
-            };
+                var deliveryRequest = new DeliveryQueue
+                {
+                    ProductID = productId,
+                    QuantityRequest = quantity,
+                    Date = DateTime.Now
+                };
 
-            _orderItemsRepository.Add(orderItem);
+                _deliveryQueueRepository.Add(deliveryRequest);
 
-            return RedirectToAction("Index", "Products");
+                var order = new Orders
+                {
+                    AppUserID = userId,
+                    Date = DateTime.Now,
+                    Status = "Not Done"
+                };
+
+                var orderItem = new OrderItems
+                {
+                    ProductID = productId,
+                    Quantity = quantity,
+                    Order = order
+                };
+
+                _orderItemsRepository.Add(orderItem);
+
+                return RedirectToAction("Index", "Products");
+            }
         }
+
 
     }
 }

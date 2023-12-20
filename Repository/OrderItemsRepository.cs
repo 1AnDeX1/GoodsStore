@@ -25,6 +25,10 @@ namespace GoodsStore.Repository
         {
             return _context.OrderItems.FirstOrDefault(p => p.OrderItemsID == id);
         }
+        public OrderItems GetByProductId(int id)
+        {
+            return _context.OrderItems.FirstOrDefault(p => p.ProductID == id);
+        }
 
         public OrderItems GetByIdNoTracking(int id)
         {
@@ -41,6 +45,11 @@ namespace GoodsStore.Repository
         {
             _context.Add(orderItem);
             return Save();
+        }
+
+        public List<OrderItems> GetOrdersByUser(AppUser appUser)
+        {
+            return _context.OrderItems.Include(p => p.Product).Include(o => o.Order).Where(u => u.Order.AppUserID == appUser.Id).ToList();
         }
     }
 }

@@ -13,9 +13,22 @@ namespace GoodsStore.Repository
         {
             _context = context;
         }
-        public List<OrderItems> GetOrdersByUser(AppUser appUser)
+
+        public Orders GetByProductId(int id)
         {
-            return _context.OrderItems.Include(p => p.Product).Include(o => o.Order).Where(u => u.Order.AppUserID == appUser.Id).ToList();
+            throw new NotImplementedException();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+
+        public bool Update(Orders order)
+        {
+            _context.Update(order);
+            return Save();
         }
     }
 }

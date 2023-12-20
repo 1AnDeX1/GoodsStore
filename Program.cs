@@ -14,7 +14,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 builder.Services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IDeliveryQueueRepository, DeliveryQueueRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

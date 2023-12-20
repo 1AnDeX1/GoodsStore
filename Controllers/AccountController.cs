@@ -13,17 +13,17 @@ namespace GoodsStore.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly AppDbContext _context;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderItemsRepository _orderItemsRepository;
         public AccountController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             AppDbContext context,
-            IOrderRepository orderRepository)
+            IOrderItemsRepository orderItemsRepository)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
-            _orderRepository = orderRepository;
+            _orderItemsRepository = orderItemsRepository;
         }
         public IActionResult Login()
         {
@@ -101,7 +101,7 @@ namespace GoodsStore.Controllers
                 return NotFound(); 
             }
 
-            var orders = _orderRepository.GetOrdersByUser(user);
+            var orders = _orderItemsRepository.GetOrdersByUser(user);
 
             return View(orders);
         }
