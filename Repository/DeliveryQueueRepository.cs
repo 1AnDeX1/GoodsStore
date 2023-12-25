@@ -18,6 +18,10 @@ namespace GoodsStore.Repository
         {
             return _context.DeliveryQueues.ToList();
         }
+        public DeliveryQueue GetByOrderId(int id)
+        {
+            return _context.DeliveryQueues.FirstOrDefault(p => p.OrderID == id);
+        }
         public List<DeliveryQueue> GetAllByProductId(int id)
         {
             return _context.DeliveryQueues.Where(p => p.ProductID == id).ToList();
@@ -43,5 +47,6 @@ namespace GoodsStore.Repository
             return saved > 0 ? true : false;
         }
 
+        
     }
 }

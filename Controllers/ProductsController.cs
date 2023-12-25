@@ -77,37 +77,61 @@ namespace GoodsStore.Controllers
         [HttpPost]
         public IActionResult Edit(int id, ProductsDto productDto)
         {
-            var product = _mapper.Map<ProductsDto>(productDto);
-            if(!ModelState.IsValid)
+            var product = _mapper.Map<Products>(productDto);
+            if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Failed to edit product");
                 return View("Edit", product);
             }
 
-            var userproduct = _productsRepository.GetByIdNoTracking(id);
-
+            var userproduct = _productsRepository.GetById(id);
+            var quantity = product.Quantity;
             if (userproduct != null)
             {
-                var editedproduct = new Products
+                userproduct.Name = product.Name;
+                userproduct.Description = product.Description;
+                userproduct.Price = product.Price;
+                userproduct.Quantity = product.Quantity;
+                userproduct.Image = product.Image;
+
+                _productsRepository.Update(userproduct);
+
+
+                var deliveryRequests = _deliveryQueueRepository.GetAllByProductId(id);
+                if (deliveryRequests != null)
                 {
-                    ProductID = id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    Quantity = product.Quantity,
-                    Image = product.Image,
-                };
+                    foreach (var request in deliveryRequests.OrderBy(d => d.Date))
+                    {
+                        if (userproduct.Quantity >= request.QuantityRequest)
+                        {
+                            userproduct.Quantity -= request.QuantityRequest;
 
-                ProcessDeliveryQueue(editedproduct);
+                            _productsRepository.Update(userproduct);
 
-                _productsRepository.Update(editedproduct);
+                            _deliveryQueueRepository.Delete(request);
+
+                            var order = _orderRepository.GetById(request.OrderID);
+                            if (order != null)
+                            {
+                                order.Status = "Done";
+                                _orderRepository.Update(order);
+                            }
+                        }
+                    }
+                }
+                
+                
+
                 return RedirectToAction("Index");
             }
             else
             {
-                return View(product);
+                return View(productDto);
             }
         }
+
+
+
 
         public IActionResult Delete(int id)
         {
@@ -126,34 +150,61 @@ namespace GoodsStore.Controllers
             _productsRepository.Delete(productDetails);
             return RedirectToAction("Index");
         }
-        #endregion
-
-        public void ProcessDeliveryQueue(Products product)
+        [HttpGet]
+        public IActionResult Add(int id)
         {
-            var deliveryQueueItems = _deliveryQueueRepository.GetAllByProductId(product.ProductID);
+            var product = _productsRepository.GetById(id);
 
-            if (deliveryQueueItems != null && deliveryQueueItems.Any())
+            if (product == null)
             {
-                foreach (var deliveryItem in deliveryQueueItems.OrderBy(d => d.Date))
-                {
-                    if (product.Quantity >= deliveryItem.QuantityRequest)
-                    {
-                        var orderItem = _orderItemsRepository.GetByProductId(product.ProductID);
-                        if (orderItem != null)
-                        {
-                            var order = orderItem.Order;
-                            if (order != null)
-                            {
-                                order.Status = "Done";
-                                _orderRepository.Update(order);
-                            }
-                        }
+                return NotFound(); // Обробити відсутній товар
+            }
 
-                        _deliveryQueueRepository.Delete(deliveryItem);
-                        product.Quantity -= deliveryItem.QuantityRequest;
+            return View(product);
+        }
+
+        [HttpPost]
+        public IActionResult Add(int productId, int quantity)
+        {
+            var product = _productsRepository.GetById(productId);
+
+
+            product.Quantity += quantity;
+
+            _productsRepository.Update(product);
+
+
+            var deliveryRequests = _deliveryQueueRepository.GetAllByProductId(productId);
+            if (deliveryRequests != null)
+            {
+                foreach (var request in deliveryRequests.OrderBy(d => d.Date))
+                {
+                    if (product.Quantity >= request.QuantityRequest)
+                    {
+                        product.Quantity -= request.QuantityRequest;
+
+                        _productsRepository.Update(product);
+
+                        _deliveryQueueRepository.Delete(request);
+
+                        var order = _orderRepository.GetById(request.OrderID);
+                        if (order != null)
+                        {
+                            order.Status = "Done";
+                            _orderRepository.Update(order);
+                        }
                     }
                 }
             }
+
+            return RedirectToAction("Index");
+
         }
+
+
+
+        #endregion
+
+
     }
 }

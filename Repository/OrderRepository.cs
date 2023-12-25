@@ -14,9 +14,19 @@ namespace GoodsStore.Repository
             _context = context;
         }
 
-        public Orders GetByProductId(int id)
+        public Orders GetById(int id)
         {
-            throw new NotImplementedException();
+            return _context.Orders.Find(id);
+        }
+
+        public int GetLastOrderId()
+        {
+            return _context.Orders.Max(order => order.OrderID);
+        }
+        public bool Add(Orders order)
+        {
+            _context.Add(order);
+            return Save();
         }
 
         public bool Save()
@@ -24,7 +34,11 @@ namespace GoodsStore.Repository
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
-
+        public bool Delete(Orders order)
+        {
+            _context.Remove(order);
+            return Save();
+        }
         public bool Update(Orders order)
         {
             _context.Update(order);

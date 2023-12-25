@@ -30,6 +30,8 @@
                                     {
                                         <a asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductID"
                                            type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <a asp-controller="Products" asp-action="Add" asp-route-id="@item.ProductID"
+                                           type="button" class="btn btn-sm btn-outline-secondary">Add</a>
                                         <a asp-controller="Products" asp-action="Delete" asp-route-id="@item.ProductID"
                                         type="button" class="btn btn-sm btn-outline-secondary">Delete</a>
                                     }

@@ -13,5 +13,6 @@ namespace GoodsStore.Models
         public string? Status { get; set; }
         public AppUser AppUsers { get; set; }
         public ICollection<OrderItems>? OrderItems { get; set; }
+        public ICollection<DeliveryQueue>? DeliveryQueues { get; set; }
     }
 }

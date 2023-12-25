@@ -11,7 +11,6 @@
                             <th scope="col">Order id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Quantity</th>
-                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -21,11 +20,6 @@
                                 <th scope="row">@order.Order.OrderID</th>
                                 <td>@order.Product.Name</td>
                                 <th scope="row">@order.Quantity</th>
-                                <td>
-                                    <a class="btn btn-outline-primary" asp-controller="OrderItems" asp-action="AdminOrderDetails" asp-route-id="@order.OrderID">
-                                        Details
-                                    </a>
-                                </td>
                             </tr>
                         }
                     </tbody>

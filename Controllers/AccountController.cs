@@ -1,6 +1,7 @@
 ﻿using GoodsStore.Data;
 using GoodsStore.Interfaces;
 using GoodsStore.Models;
+using GoodsStore.Repository;
 using GoodsStore.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,16 +15,23 @@ namespace GoodsStore.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly AppDbContext _context;
         private readonly IOrderItemsRepository _orderItemsRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IDeliveryQueueRepository _deliveryQueueRepository;
+
         public AccountController(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             AppDbContext context,
-            IOrderItemsRepository orderItemsRepository)
+            IOrderItemsRepository orderItemsRepository,
+            IOrderRepository orderRepository,
+            IDeliveryQueueRepository deliveryQueueRepository)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _orderItemsRepository = orderItemsRepository;
+            _orderRepository = orderRepository;
+            _deliveryQueueRepository = deliveryQueueRepository;
         }
         public IActionResult Login()
         {

@@ -23,11 +23,15 @@
                                 <td>@order.Product.Name</td>
                                 <th scope="row">@order.Quantity</th>
                                 <th scope="row">@order.Order.Status</th>
-                                <td>
-                                    <a class="btn btn-outline-primary" asp-controller="OrderItems" asp-action="AdminOrderDetails" asp-route-id="@order.OrderID">
-                                        Details
-                                    </a>
-                                </td>
+
+                                @if (order.Order.Status == "Not Done")
+                                {
+                                    <td>
+                                        <a class="btn btn-danger" asp-controller="OrderItems" asp-action="Cancel" asp-route-id="@order.OrderID">
+                                            Cancel
+                                        </a>
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>

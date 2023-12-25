@@ -39,6 +39,11 @@ namespace GoodsStore.Repository
         {
             return _context.Products.AsNoTracking().FirstOrDefault(i => i.ProductID == id);
         }
+        public bool Update(Products product)
+        {
+            _context.Update(product);
+            return Save();
+        }
 
         public bool Save()
         {
@@ -46,10 +51,6 @@ namespace GoodsStore.Repository
             return saved > 0 ? true : false;
         }
 
-        public bool Update(Products product)
-        {
-            _context.Update(product);
-            return Save();
-        }
+        
     }
 }

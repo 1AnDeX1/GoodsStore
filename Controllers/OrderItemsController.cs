@@ -10,6 +10,7 @@ namespace GoodsStore.Controllers
     public class OrderItemsController : Controller
     {
         private readonly IOrderItemsRepository _orderItemsRepository;
+        private readonly IOrderRepository _orderRepository;
         private readonly IProductsRepository _productsRepository;
         private readonly IUserRepository _userRepository;
         private readonly IDeliveryQueueRepository _deliveryQueueRepository;
@@ -17,12 +18,14 @@ namespace GoodsStore.Controllers
 
         public OrderItemsController(
             IOrderItemsRepository orderItemsRepository,
+            IOrderRepository orderRepository,
             IProductsRepository productsRepository,
             IUserRepository userRepository,
             IDeliveryQueueRepository deliveryQueueRepository,
             IMapper mapper)
         {
             _orderItemsRepository = orderItemsRepository;
+            _orderRepository = orderRepository;
             _productsRepository = productsRepository;
             _userRepository = userRepository;
             _deliveryQueueRepository = deliveryQueueRepository;
@@ -70,6 +73,8 @@ namespace GoodsStore.Controllers
                     Status = "Done" 
                 };
 
+                _orderRepository.Add(order);
+
                 var orderItem = new OrderItems
                 {
                     ProductID = productId,
@@ -86,28 +91,34 @@ namespace GoodsStore.Controllers
             }
             else
             {
-                var deliveryRequest = new DeliveryQueue
-                {
-                    ProductID = productId,
-                    QuantityRequest = quantity,
-                    Date = DateTime.Now
-                };
-
-                _deliveryQueueRepository.Add(deliveryRequest);
-
                 var order = new Orders
                 {
                     AppUserID = userId,
                     Date = DateTime.Now,
                     Status = "Not Done"
                 };
+                _orderRepository.Add(order);
+                var lastOrderId = _orderRepository.GetLastOrderId();
 
                 var orderItem = new OrderItems
                 {
+                    OrderID = lastOrderId,
                     ProductID = productId,
                     Quantity = quantity,
                     Order = order
                 };
+
+                
+
+                var deliveryRequest = new DeliveryQueue
+                {
+                    ProductID = productId,
+                    OrderID = lastOrderId,
+                    QuantityRequest = quantity,
+                    Date = DateTime.Now
+                };
+
+                _deliveryQueueRepository.Add(deliveryRequest);
 
                 _orderItemsRepository.Add(orderItem);
 
@@ -115,6 +126,27 @@ namespace GoodsStore.Controllers
             }
         }
 
+        [HttpGet("OrderItems/Cancel/{orderid}")]
+        public IActionResult Cancel(int orderid)
+        {
+            var orderItem = _orderItemsRepository.GetByOrderID(orderid);
+            var order = _orderRepository.GetById(orderid);
+            if (orderItem != null && order.Status == "Not Done")
+            {
+                order.Status = "Cancelled";
+                _orderRepository.Update(order);
+
+                var deliveryRequest = _deliveryQueueRepository.GetByOrderId(orderid);
+                if (deliveryRequest != null)
+                {
+                    _deliveryQueueRepository.Delete(deliveryRequest);
+                }
+
+                return RedirectToAction("UserOrders", "Account");
+            }
+
+            return NotFound();
+        }
 
     }
 }

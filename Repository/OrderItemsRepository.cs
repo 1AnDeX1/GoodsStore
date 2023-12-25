@@ -21,13 +21,14 @@ namespace GoodsStore.Repository
             return _context.OrderItems.Include(p => p.Product).Include(o => o.Order).ToList();
         }
 
-        public OrderItems GetByOrderId(int id)
+        public OrderItems GetByOrderID(int id)
         {
-            return _context.OrderItems.FirstOrDefault(p => p.OrderItemsID == id);
+            return _context.OrderItems.FirstOrDefault(p => p.OrderID == id);
         }
+
         public OrderItems GetByProductId(int id)
         {
-            return _context.OrderItems.FirstOrDefault(p => p.ProductID == id);
+            return _context.OrderItems.Include(p => p.Product).Include(o => o.Order).FirstOrDefault(p => p.ProductID == id);
         }
 
         public OrderItems GetByIdNoTracking(int id)
@@ -44,6 +45,11 @@ namespace GoodsStore.Repository
         public bool Add(OrderItems orderItem)
         {
             _context.Add(orderItem);
+            return Save();
+        }
+        public bool Delete(OrderItems orderItem)
+        {
+            _context.Remove(orderItem);
             return Save();
         }
 
