@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using GoodsStore.Data;
 using GoodsStore.Dto;
 using GoodsStore.Interfaces;
 using GoodsStore.Models;
-using GoodsStore.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace GoodsStore.Controllers
 {
@@ -36,7 +32,7 @@ namespace GoodsStore.Controllers
             var products = _productsRepository.GetAll();
             return View(products);
         }
-        #region Standart Logic
+
         public IActionResult Detail(int id)
         {
             var product = _productsRepository.GetById(id); 
@@ -47,16 +43,17 @@ namespace GoodsStore.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Products product)
+        public IActionResult Create(ProductsDto productDto)
         {
-            if(!ModelState.IsValid)
+            var product = _mapper.Map<Products>(productDto);
+
+            if (!ModelState.IsValid)
             {
                 return View(product);
             }
             _productsRepository.Add(product);
             return RedirectToAction("Index");
         }
-
 
         public IActionResult Edit(int id)
         {
@@ -96,7 +93,6 @@ namespace GoodsStore.Controllers
 
                 _productsRepository.Update(userproduct);
 
-
                 var deliveryRequests = _deliveryQueueRepository.GetAllByProductId(id);
                 if (deliveryRequests != null)
                 {
@@ -120,8 +116,6 @@ namespace GoodsStore.Controllers
                     }
                 }
                 
-                
-
                 return RedirectToAction("Index");
             }
             else
@@ -129,9 +123,6 @@ namespace GoodsStore.Controllers
                 return View(productDto);
             }
         }
-
-
-
 
         public IActionResult Delete(int id)
         {
@@ -173,7 +164,6 @@ namespace GoodsStore.Controllers
 
             _productsRepository.Update(product);
 
-
             var deliveryRequests = _deliveryQueueRepository.GetAllByProductId(productId);
             if (deliveryRequests != null)
             {
@@ -196,15 +186,7 @@ namespace GoodsStore.Controllers
                     }
                 }
             }
-
             return RedirectToAction("Index");
-
         }
-
-
-
-        #endregion
-
-
     }
 }
